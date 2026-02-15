@@ -1,323 +1,209 @@
-# Requirements Document
+# Requirements: CodeMentor AI
 
-## Project: AI-Powered Code Learning Assistant
+## Overview
 
-### 1. Project Overview
+AI-powered learning platform for beginner developers. Provides code explanations, interactive chat assistance, and learning progress tracking. Built for a 48-hour hackathon.
 
-**Project Name:** CodeMentor AI
+**Target Users:** Beginner developers and coding students  
+**Core Features:** Code analysis, AI chat, history tracking  
+**Tech Stack:** Django REST + React + OpenAI GPT-3.5  
+**Timeline:** 48 hours, deploy by hour 44
 
-**Problem Statement:** AI for Learning & Developer Productivity
+## Key Terms
 
-**Target Audience:** Beginner developers and students learning to code
+- **User**: Registered beginner developer or student
+- **Code_Snippet**: Source code submitted for AI analysis
+- **Chat_Session**: Conversation thread with AI assistant
+- **Supported_Language**: Python, JavaScript, Java, or C++
 
-**Core Purpose:** An AI-powered platform that helps beginner developers understand code, generate documentation, and accelerate their learning journey through intelligent code analysis and interactive guidance.
+## Requirements
 
----
+### 1. User Authentication
 
-### 2. Functional Requirements
+**User Story:** As a new user, I want to create an account and securely log in to access personalized features.
 
-#### 2.1 Core Features
+**Acceptance Criteria:**
 
-##### Feature 1: Code Analysis & Explanation
-- **FR-1.1:** System shall accept code snippets in multiple programming languages (Python, JavaScript, Java, C++, etc.)
-- **FR-1.2:** System shall provide line-by-line explanations of code functionality
-- **FR-1.3:** System shall identify and explain code patterns, algorithms, and best practices
-- **FR-1.4:** System shall detect potential bugs or code smells and suggest improvements
-- **FR-1.5:** System shall explain complexity analysis (time/space complexity) for algorithms
-- **FR-1.6:** System shall support file upload (.py, .js, .java, .cpp, etc.) for analysis
+1. Valid registration (email, username, password) creates account and returns JWT tokens
+2. Duplicate email/username returns validation error
+3. Valid login returns access + refresh tokens
+4. Invalid credentials return authentication error
+5. Valid refresh token issues new access token
+6. Invalid/expired refresh token requires re-authentication
+7. Passwords are hashed before storage
+8. Valid JWT grants access to protected endpoints
+9. Invalid/expired JWT returns authorization error
 
-##### Feature 2: Interactive Q&A Chat Interface
-- **FR-2.1:** System shall provide a conversational AI interface for asking coding questions
-- **FR-2.2:** System shall maintain conversation context for follow-up questions
-- **FR-2.3:** System shall provide code examples in responses when relevant
-- **FR-2.4:** System shall support syntax-highlighted code blocks in responses
-- **FR-2.5:** System shall save chat history for user reference
-- **FR-2.6:** System shall allow users to rate responses for quality feedback
+### 2. Code Analysis
 
-##### Feature 3: Project Documentation Generation
-- **FR-3.1:** System shall analyze entire project repositories or folders
-- **FR-3.2:** System shall generate README.md files with project descriptions
-- **FR-3.3:** System shall create function/class documentation (docstrings)
-- **FR-3.4:** System shall generate API documentation for endpoints
-- **FR-3.5:** System shall create setup and installation instructions
-- **FR-3.6:** System shall identify and document dependencies
-- **FR-3.7:** System shall export documentation in markdown format
+**User Story:** As a beginner developer, I want to submit code and receive detailed explanations to understand how it works.
 
-##### Feature 4: Learning Path Recommendations
-- **FR-4.1:** System shall assess user's current skill level through code analysis
-- **FR-4.2:** System shall recommend topics/concepts to learn next
-- **FR-4.3:** System shall provide curated learning resources (articles, tutorials)
-- **FR-4.4:** System shall track user progress over time
-- **FR-4.5:** System shall suggest practice problems based on weak areas
-- **FR-4.6:** System shall create personalized learning roadmaps
+**Acceptance Criteria:**
 
-#### 2.2 User Management
-- **FR-5.1:** Users shall be able to register with email and password
-- **FR-5.2:** Users shall be able to login and logout securely
-- **FR-5.3:** Users shall have personal dashboards showing their activity
-- **FR-5.4:** Users shall be able to save favorite code snippets and explanations
-- **FR-5.5:** Users shall be able to view their learning progress and history
+1. Code in supported language (Python/JS/Java/C++) generates line-by-line explanation
+2. Unsupported language returns error with supported language list
+3. Empty code snippet returns validation error
+4. Successful analysis stores code, language, and explanation with user association
+5. Code history returns user's snippets ordered by date (newest first)
+6. User can retrieve their own snippets by ID
+7. User cannot access other users' snippets (returns 403)
+8. User can delete their own snippets
+9. System supports Python, JavaScript, Java, and C++
+10. AI API failures don't store incomplete data
 
----
+### 3. Interactive Chat
 
-### 3. Non-Functional Requirements
+**User Story:** As a student, I want to chat with an AI assistant about programming questions for immediate help.
 
-#### 3.1 Performance
-- **NFR-1.1:** Code analysis response time shall be under 5 seconds for snippets < 500 lines
-- **NFR-1.2:** Chat responses shall be generated within 3 seconds
-- **NFR-1.3:** System shall support at least 100 concurrent users
-- **NFR-1.4:** API response time shall be under 2 seconds for 95% of requests
+**Acceptance Criteria:**
 
-#### 3.2 Scalability
-- **NFR-2.1:** System architecture shall support horizontal scaling
-- **NFR-2.2:** Database shall efficiently handle 10,000+ code snippets
-- **NFR-2.3:** System shall queue long-running documentation generation tasks
+1. Creating chat session returns unique session ID
+2. Sending message stores user message, generates AI response, stores both
+3. Sending to non-existent session returns error
+4. User cannot send messages to other users' sessions (returns 403)
+5. User's chat sessions returned ordered by last update (newest first)
+6. Session messages returned in chronological order
+7. Chat maintains conversation context within each session
+8. AI API failures don't store incomplete conversation data
+9. Messages stored with role (user/assistant) and timestamp
 
-#### 3.3 Security
-- **NFR-3.1:** All user passwords shall be hashed using bcrypt or similar
-- **NFR-3.2:** API endpoints shall be protected with JWT authentication
-- **NFR-3.3:** User code submissions shall be sanitized to prevent injection attacks
-- **NFR-3.4:** HTTPS shall be enforced for all connections in production
+### 4. Rate Limiting
 
-#### 3.4 Usability
-- **NFR-4.1:** Interface shall be intuitive for beginners with minimal learning curve
-- **NFR-4.2:** Code editor shall support syntax highlighting for major languages
-- **NFR-4.3:** UI shall be responsive and work on desktop, tablet, and mobile devices
-- **NFR-4.4:** Error messages shall be clear and actionable
+**User Story:** As admin, I want to control API usage to stay within OpenAI free tier budget.
 
-#### 3.5 Reliability
-- **NFR-5.1:** System uptime shall be 99% during hackathon demo period
-- **NFR-5.2:** Failed AI requests shall be logged and retried automatically
-- **NFR-5.3:** System shall gracefully handle model errors without crashing
+**Acceptance Criteria:**
 
----
+1. System logs warnings when approaching API credit limit
+2. Excessive requests trigger rate limiting with error response
+3. System tracks total API usage and remaining credits
+4. Exhausted credits prevent further AI API calls with error message
 
-### 4. Technical Requirements
+### 5. Dashboard & History
 
-#### 4.1 Backend (Python/Django)
-- **TR-1.1:** Python 3.10 or higher
-- **TR-1.2:** Django 4.2+ or Django REST Framework 3.14+
-- **TR-1.3:** PostgreSQL or SQLite database
-- **TR-1.4:** Celery for async task processing (optional but recommended)
-- **TR-1.5:** Redis for caching and session management (optional)
+**User Story:** As a user, I want to view past code explanations and chats from a dashboard.
 
-#### 4.2 Frontend (React)
-- **TR-2.1:** React 18+
-- **TR-2.2:** React Router for navigation
-- **TR-2.3:** Axios or Fetch for API calls
-- **TR-2.4:** State management (Redux/Context API/Zustand)
-- **TR-2.5:** Code editor component (Monaco Editor, CodeMirror, or react-ace)
-- **TR-2.6:** Markdown renderer for documentation display
+**Acceptance Criteria:**
 
-#### 4.3 AI/ML Components
-- **TR-3.1:** Custom trained model OR fine-tuned open-source model (e.g., CodeBERT, CodeT5, StarCoder)
-- **TR-3.2:** Alternative: Integration with OpenAI API, Anthropic Claude API, or similar
-- **TR-3.3:** Hugging Face Transformers library for model inference
-- **TR-3.4:** PyTorch or TensorFlow for model operations
-- **TR-3.5:** Tokenizer appropriate for code (e.g., BPE, CodeBERT tokenizer)
+1. Dashboard displays overview of recent snippets and chat sessions
+2. History page shows all saved snippets with preview info
+3. Clicking history item displays complete snippet and explanation
+4. Deleting history item removes it and updates display
+5. Copy-to-clipboard functionality for snippets and explanations
 
-#### 4.4 APIs & Integrations
-- **TR-4.1:** RESTful API architecture
-- **TR-4.2:** JSON data format for all API communications
-- **TR-4.3:** Swagger/OpenAPI documentation for API endpoints
-- **TR-4.4:** CORS configuration for frontend-backend communication
+### 6. Multi-Language Support
 
----
+**User Story:** As a developer learning multiple languages, I want accurate analysis for Python, JS, Java, and C++.
 
-### 5. Data Requirements
+**Acceptance Criteria:**
 
-#### 5.1 Data Storage
-- **DR-1.1:** User profiles (email, password hash, registration date)
-- **DR-1.2:** Code snippets (code, language, timestamp, user_id)
-- **DR-1.3:** Chat conversations (messages, responses, timestamps)
-- **DR-1.4:** Generated documentation (content, format, metadata)
-- **DR-1.5:** Learning progress (topics covered, skill assessments, timestamps)
+1. Language validated against supported list (python, javascript, java, cpp)
+2. Code processed with language-specific context
+3. Language-appropriate syntax highlighting in editor
+4. Language identifier stored with code snippets
 
-#### 5.2 Training Data (if training custom model)
-- **DR-2.1:** Code-comment pairs from open-source repositories
-- **DR-2.2:** Code documentation datasets (e.g., CodeSearchNet)
-- **DR-2.3:** Programming Q&A pairs (Stack Overflow, GitHub issues)
-- **DR-2.4:** Minimum 10,000 code examples across multiple languages
+### 7. Responsive UI
 
----
+**User Story:** As a user on different devices, I want the interface to work well on desktop, tablet, and mobile.
 
-### 6. Constraints & Assumptions
+**Acceptance Criteria:**
 
-#### 6.1 Constraints
-- **C-1:** Hackathon timeline (typically 24-48 hours)
-- **C-2:** Limited computational resources for model training
-- **C-3:** Team size and expertise limitations
-- **C-4:** Free tier limitations of third-party APIs (if used)
+1. Mobile displays optimized layout with appropriate touch targets
+2. Tablet displays responsive layout utilizing available space
+3. Desktop displays full-featured interface
+4. No horizontal scrolling on any viewport size
+5. Code editor accessible on mobile devices
 
-#### 6.2 Assumptions
-- **A-1:** Users have basic understanding of programming concepts
-- **A-2:** Users have stable internet connection
-- **A-3:** Most code submissions will be under 1000 lines
-- **A-4:** Primary languages will be Python, JavaScript, and Java
+### 8. Data Persistence
 
----
+**User Story:** As a user, I want my data reliably stored so I don't lose learning progress.
 
-### 7. Success Metrics
+**Acceptance Criteria:**
 
-#### 7.1 Functional Success
-- **SM-1.1:** 90% accuracy in code explanation relevance (user feedback)
-- **SM-1.2:** Successfully generate documentation for 95% of valid code submissions
-- **SM-1.3:** Chat responses are helpful in 85% of interactions (user ratings)
-- **SM-1.4:** Learning recommendations match user skill level in 80% of cases
+1. Content persisted to database before confirming success
+2. Database failures return error (don't report success)
+3. Referential integrity maintained between users and their data
+4. User deletion cascades to all associated data
+5. Timestamps recorded for all entities
+6. PostgreSQL in production, SQLite in development
 
-#### 7.2 User Experience
-- **SM-2.1:** Average user session duration > 10 minutes
-- **SM-2.2:** User satisfaction score > 4/5
-- **SM-2.3:** Feature adoption rate > 70% for each core feature
+### 9. Error Handling
 
-#### 7.3 Technical Performance
-- **SM-3.1:** Zero critical bugs during demo
-- **SM-3.2:** API response time < 3 seconds average
-- **SM-3.3:** Successful deployment with 99% uptime during judging
+**User Story:** As a user, I want clear error messages when something goes wrong.
 
----
+**Acceptance Criteria:**
 
-### 8. MVP (Minimum Viable Product) Scope
+1. Validation errors indicate which field failed and why
+2. Authentication errors don't expose security details
+3. Authorization errors indicate insufficient permissions
+4. Server errors return generic message, log details for debugging
+5. AI API failures return user-friendly "service unavailable" message
+6. Appropriate HTTP status codes (200, 201, 400, 401, 403, 404, 500)
+7. Successful operations return confirmation with relevant data
 
-For the hackathon, prioritize these features:
+### 10. Code Editor
 
-**Must Have (P0):**
-1. Code explanation for basic snippets (Python, JavaScript)
-2. Interactive chat interface with AI responses
-3. User authentication (register/login)
-4. Basic frontend with code editor
+**User Story:** As a user, I want a professional code editor with syntax highlighting.
 
-**Should Have (P1):**
-5. Documentation generation for functions/classes
-6. Code syntax highlighting and formatting
-7. Save and retrieve past code submissions
+**Acceptance Criteria:**
 
-**Nice to Have (P2):**
-8. Learning path recommendations
-9. Multi-language support beyond Python/JavaScript
-10. Advanced analytics and progress tracking
+1. Code explanation page displays Monaco Editor
+2. Syntax highlighting based on selected language
+3. Changing language updates editor highlighting
+4. Common editor shortcuts supported (copy, paste, undo, redo)
+5. Pasted code preserves formatting and indentation
+
+### 11. Security
+
+**User Story:** As a security-conscious user, I want my session secure with automatic expiration.
+
+**Acceptance Criteria:**
+
+1. JWT token expires after 1 hour
+2. Refresh token expires after 7 days
+3. Expired JWT requires refresh or re-authentication
+4. Secure HTTP-only cookies for token storage where applicable
+5. CORS policies restrict API access to authorized origins
+6. All user input validated to prevent injection attacks
+
+### 12. Deployment
+
+**User Story:** As a developer, I want clear environment separation for reliable deployment.
+
+**Acceptance Criteria:**
+
+1. Separate configuration for dev, staging, and production
+2. Sensitive config (API keys, DB credentials) from environment variables
+3. SQLite for development, PostgreSQL for production
+4. Database migration scripts for schema management
+5. Static frontend assets served efficiently in production
+6. Deployable within 44 hours of hackathon start
+
 
 ---
 
-### 9. Out of Scope
+## Why CodeMentor AI? (Competitive Differentiation)
 
-The following are explicitly out of scope for this hackathon:
-- Real-time collaborative editing
-- Mobile native applications (iOS/Android)
-- Integration with IDEs (VS Code extensions)
-- Payment/subscription systems
-- Advanced code execution/testing features
-- Support for proprietary/enterprise codebases
-- Multi-user team features
+This table shows how CodeMentor AI stands out from existing solutions for beginner developers:
 
----
+| Feature | CodeMentor AI | ChatGPT | GitHub Copilot | Stack Overflow |
+|---------|---------------|---------|----------------|----------------|
+| **Code Explanation** | ✅ Specialized for learning | ⚠️ Generic answers | ⚠️ Auto-complete focus | ❌ Community Q&A only |
+| **Learning History** | ✅ Saves all explanations | ❌ No history | ❌ No history | ❌ No personal tracking |
+| **Language Support** | ✅ 4 beginner languages | ✅ All languages | ✅ All languages | ✅ All languages |
+| **Interactive Chat** | ✅ Context-aware tutoring | ✅ General chat | ⚠️ Code suggestions | ❌ No chat |
+| **Beginner-Focused** | ✅ Designed for learners | ⚠️ All skill levels | ⚠️ Professional devs | ⚠️ Mixed audience |
+| **Progress Tracking** | ✅ Dashboard with history | ❌ No tracking | ❌ No tracking | ❌ No tracking |
+| **Cost** | ✅ Free tier available | ⚠️ Limited free | ⚠️ Paid subscription | ✅ Free |
+| **Built-in Editor** | ✅ Monaco Editor | ❌ Text box only | ✅ VS Code native | ❌ Text box only |
 
-### 10. Technology Stack Summary
+### Key Advantages for Hackathon Judges:
 
-| Component | Technology |
-|-----------|------------|
-| Backend Framework | Django / Django REST Framework |
-| Backend Language | Python 3.10+ |
-| Database | PostgreSQL / SQLite |
-| Frontend Framework | React 18+ |
-| Frontend Language | JavaScript (ES6+) / TypeScript |
-| AI/ML Framework | PyTorch / TensorFlow + Hugging Face |
-| Model | Custom trained / Fine-tuned CodeBERT or CodeT5 / API (OpenAI/Claude) |
-| Authentication | JWT (JSON Web Tokens) |
-| API Style | RESTful |
-| Deployment | Docker, Heroku, Vercel, or similar |
-| Version Control | Git + GitHub |
+1. **Focused Solution**: Unlike ChatGPT's general-purpose approach, CodeMentor AI is specifically designed for beginner developers learning to code
 
----
+2. **Learning Journey**: Tracks user progress with saved explanations and chat history - something no competitor offers
 
-### 11. Dependencies & Libraries
+3. **All-in-One Platform**: Combines code editor, AI explanations, and interactive chat in one place (competitors require multiple tools)
 
-#### Backend Dependencies
-```
-Django>=4.2.0
-djangorestframework>=3.14.0
-django-cors-headers>=4.0.0
-djangorestframework-simplejwt>=5.2.0
-transformers>=4.30.0
-torch>=2.0.0
-psycopg2-binary>=2.9.0  # for PostgreSQL
-celery>=5.3.0  # optional for async tasks
-redis>=4.5.0  # optional for caching
-python-dotenv>=1.0.0
-gunicorn>=20.1.0  # for deployment
-```
+4. **Beginner-First Design**: Explanations are tailored for learning, not just solving problems quickly
 
-#### Frontend Dependencies
-```
-react>=18.0.0
-react-dom>=18.0.0
-react-router-dom>=6.11.0
-axios>=1.4.0
-@monaco-editor/react>=4.5.0  # or other code editor
-react-markdown>=8.0.0
-styled-components>=6.0.0  # or tailwindcss
-```
-
----
-
-### 12. Risk Assessment
-
-| Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
-| Model training takes too long | High | High | Use pre-trained model or API fallback |
-| API rate limits exceeded | Medium | Medium | Implement caching, use multiple API keys |
-| Poor code explanation quality | High | Medium | Fine-tune prompts, use better base model |
-| Frontend-backend integration issues | Medium | Low | Early integration testing, clear API contracts |
-| Deployment problems | High | Medium | Test deployment early, have backup plan |
-
----
-
-### 13. Timeline & Milestones
-
-**Phase 1: Setup & Foundation (Hours 0-6)**
-- Project initialization
-- Environment setup
-- Basic Django + React scaffolding
-- Database schema design
-
-**Phase 2: Core Development (Hours 6-18)**
-- Backend API development
-- AI model integration
-- Frontend component development
-- User authentication
-
-**Phase 3: Feature Integration (Hours 18-30)**
-- Code explanation feature
-- Chat interface
-- Documentation generation
-- Testing and bug fixes
-
-**Phase 4: Polish & Deployment (Hours 30-36)**
-- UI/UX improvements
-- Deployment to hosting platform
-- Documentation and README
-- Demo preparation
-
-**Phase 5: Demo & Presentation (Hours 36-48)**
-- Final testing
-- Presentation slides
-- Live demo practice
-- Submission
-
----
-
-### 14. Evaluation Criteria Alignment
-
-This project addresses the hackathon criteria:
-
-**Clarity:** Clean UI, clear explanations, beginner-friendly language
-**Usefulness:** Solves real pain points for beginner developers
-**AI Integration:** Meaningful use of AI for code understanding and learning
-**Learning Experience:** Accelerates learning through intelligent guidance
-**Innovation:** Combines multiple AI capabilities in one platform
-
----
-
-**Document Version:** 1.0  
-**Last Updated:** [Current Date]  
-**Project Team:** [Your Team Name]
+5. **Hackathon-Ready**: Built within 48 hours with clear MVP scope, deployable, and scalable architecture
