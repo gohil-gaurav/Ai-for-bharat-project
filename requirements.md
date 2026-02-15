@@ -1,4 +1,4 @@
-# Requirements: CodeMentor AI
+# Requirements:AI Powered Learning platform
 
 ## Overview
 
@@ -6,7 +6,7 @@ AI-powered learning platform for beginner developers. Provides code explanations
 
 **Target Users:** Beginner developers and coding students  
 **Core Features:** Code analysis, AI chat, history tracking  
-**Tech Stack:** Django REST + React + OpenAI GPT-3.5  
+**Tech Stack:** Django REST + React + kiro
 **Timeline:** 48 hours, deploy by hour 44
 
 ## Key Terms
@@ -14,7 +14,7 @@ AI-powered learning platform for beginner developers. Provides code explanations
 - **User**: Registered beginner developer or student
 - **Code_Snippet**: Source code submitted for AI analysis
 - **Chat_Session**: Conversation thread with AI assistant
-- **Supported_Language**: Python, JavaScript, Java, or C++
+- **Supported_Language**: Python, JavaScript
 
 ## Requirements
 
@@ -40,7 +40,7 @@ AI-powered learning platform for beginner developers. Provides code explanations
 
 **Acceptance Criteria:**
 
-1. Code in supported language (Python/JS/Java/C++) generates line-by-line explanation
+1. Code in supported language (Python/JS) generates line-by-line explanation
 2. Unsupported language returns error with supported language list
 3. Empty code snippet returns validation error
 4. Successful analysis stores code, language, and explanation with user association
@@ -48,7 +48,7 @@ AI-powered learning platform for beginner developers. Provides code explanations
 6. User can retrieve their own snippets by ID
 7. User cannot access other users' snippets (returns 403)
 8. User can delete their own snippets
-9. System supports Python, JavaScript, Java, and C++
+9. System supports Python, JavaScript
 10. AI API failures don't store incomplete data
 
 ### 3. Interactive Chat
@@ -69,14 +69,14 @@ AI-powered learning platform for beginner developers. Provides code explanations
 
 ### 4. Rate Limiting
 
-**User Story:** As admin, I want to control API usage to stay within OpenAI free tier budget.
+**User Story:** As admin, I want to control AI usage also extend by the pricing . 
 
 **Acceptance Criteria:**
 
-1. System logs warnings when approaching API credit limit
+1. System logs warnings when approaching ai usage limit 
 2. Excessive requests trigger rate limiting with error response
-3. System tracks total API usage and remaining credits
-4. Exhausted credits prevent further AI API calls with error message
+3. System tracks total AI usage and remaining credits
+4. Renew every day or month according
 
 ### 5. Dashboard & History
 
@@ -181,11 +181,11 @@ AI-powered learning platform for beginner developers. Provides code explanations
 
 ---
 
-## Why CodeMentor AI? (Competitive Differentiation)
+## Why Neurolearn  AI? (Competitive Differentiation)
 
 This table shows how CodeMentor AI stands out from existing solutions for beginner developers:
 
-| Feature | CodeMentor AI | ChatGPT | GitHub Copilot | Stack Overflow |
+| Feature | Neurolearn AI | ChatGPT | GitHub Copilot | Stack Overflow |
 |---------|---------------|---------|----------------|----------------|
 | **Code Explanation** | ✅ Specialized for learning | ⚠️ Generic answers | ⚠️ Auto-complete focus | ❌ Community Q&A only |
 | **Learning History** | ✅ Saves all explanations | ❌ No history | ❌ No history | ❌ No personal tracking |
